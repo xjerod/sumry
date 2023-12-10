@@ -1,0 +1,12 @@
+feat(ui:layout): update layout to use real tabs (#15)
+feat(ui:tabs): going to a new chat automatically opens in a tab
+fix(ui:tabs): tabs now properly resize and reflow (#19)
+feat(ui:tabs): tabs are now closable and responsive (#20)
+refactor(chat): allow anon chat
+fix(ui:tabs): tabs have a max width and properly close
+chore(ui): 0.6.0 release
+fix(auth): update token validation
+fix(chat): alternating backgrounds now key off the message itself
+fix(chat): convert nav debounce to autoscroll debounce
+Update README.md (#21)
+feat(logger): add trace level
