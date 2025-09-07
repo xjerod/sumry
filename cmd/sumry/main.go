@@ -221,11 +221,13 @@ func main() {
 		}
 	}
 
+	backupExistingSumryFile := true
 	fileName := fmt.Sprintf("%s/%s", projectRoot, sumryFile)
 	firstLine, err := headFile(fileName)
 	if err != nil {
 		log.Warn("failed to read file", "file", fileName, "error", err)
 		firstLine = "[commit]: # ''"
+		backupExistingSumryFile = false
 	}
 
 	if commit, ok := parseSumryFileCommit(firstLine); ok {
@@ -262,8 +264,10 @@ func main() {
 			// print the file to stdout so it's easy to capture in scripts if you want
 			_, _ = fmt.Fprint(os.Stdout, fileContents)
 		} else {
-			if err := backupSumryFile(); err != nil {
-				logger.Fatal("failed to backup sumry file")
+			if backupExistingSumryFile {
+				if err := backupSumryFile(); err != nil {
+					logger.Fatal("failed to backup sumry file")
+				}
 			}
 
 			if err := writeSumryFile(fileContents); err != nil {
