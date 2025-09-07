@@ -75,7 +75,9 @@ func headFile(fileName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	scanner := bufio.NewScanner(file)
 	if scanner.Scan() {
@@ -258,7 +260,7 @@ func main() {
 		if !update {
 			logger.Info("update not enabled, printing sumry file")
 			// print the file to stdout so it's easy to capture in scripts if you want
-			fmt.Fprint(os.Stdout, fileContents)
+			_, _ = fmt.Fprint(os.Stdout, fileContents)
 		} else {
 			if err := backupSumryFile(); err != nil {
 				logger.Fatal("failed to backup sumry file")
