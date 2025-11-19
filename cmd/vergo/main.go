@@ -161,13 +161,18 @@ func processTauriConfigJson() {
 		log.Fatal("failed to parse tauri.conf.json", "err", err)
 	}
 
+	var rawVersion any
 	pkg, pkgOK := taurConfJson["package"].(map[string]any)
 	if !pkgOK {
-		log.Fatal("unexpected key", "package", taurConfJson["package"])
-	}
-	log.Debug("parsing tauri.conf.json version", "version", pkg["version"])
+		log.Debug("parsing tauri.conf.json root version", "version", taurConfJson["version"])
+		rawVersion = taurConfJson["version"]
 
-	strVersion, versionOK := pkg["version"].(string)
+	} else {
+		log.Debug("parsing tauri.conf.json package version", "version", pkg["version"])
+		rawVersion = pkg["version"]
+	}
+
+	strVersion, versionOK := rawVersion.(string)
 	if !versionOK {
 		log.Fatal("unexpected value type", "version", pkg["version"])
 	}
@@ -214,7 +219,7 @@ func processCargoToml() {
 
 	pkg, pkgOK := cargoToml["package"].(map[string]any)
 	if !pkgOK {
-		log.Fatal("unexpected key", "package", cargoToml["package"])
+		log.Fatal("unexpected key type", "package", cargoToml["package"])
 	}
 	log.Debug("parsing Cargo.toml version", "version", pkg["version"])
 
