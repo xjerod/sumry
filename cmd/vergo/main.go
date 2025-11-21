@@ -136,7 +136,7 @@ func processPackageJson() {
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
 	enc.SetEscapeHTML(false)
-	enc.SetIndent("", "\t")
+	enc.SetIndent("", "    ")
 
 	if err := enc.Encode(pkgJson); err != nil {
 		log.Fatal("failed to marshal package.json", "err", err)
@@ -195,10 +195,14 @@ func processTauriConfigJson() {
 		return
 	}
 
-	pkg["version"] = version.ToString()
-	taurConfJson["package"] = pkg
+	if !pkgOK {
+		taurConfJson["version"] = version.ToString()
+	} else {
+		pkg["version"] = version.ToString()
+		taurConfJson["package"] = pkg
+	}
 
-	outData, err := json.MarshalIndent(taurConfJson, "", "  ")
+	outData, err := json.MarshalIndent(taurConfJson, "", "    ")
 	if err != nil {
 		log.Fatal("failed to marshal", "err", err)
 	}
@@ -249,12 +253,15 @@ func processCargoToml() {
 	pkg["version"] = version.ToString()
 	cargoToml["package"] = pkg
 
-	outData, err := toml.Marshal(&cargoToml)
-	if err != nil {
+	buff := new(bytes.Buffer)
+	encoder := toml.NewEncoder(buff)
+	encoder.Indent = ""
+
+	if err := encoder.Encode(&cargoToml); err != nil {
 		log.Fatal("failed to marshal", "err", err)
 	}
 
-	if err := os.WriteFile(cargoTomlPath, outData, 0o664); err != nil {
+	if err := os.WriteFile(cargoTomlPath, buff.Bytes(), 0o664); err != nil {
 		log.Fatal("failed to write file", "file", cargoTomlPath, "err", err)
 	}
 }
